@@ -16,12 +16,6 @@
 import pandas as pd
 import sklearn
 
-# +
-# ----- taking json file and making it smaller in size (originally orient=records ==> file too large for git) -----#
-# df = pd.read_json('data\\cleaned_df_numerical_columns_only.json')
-# df.to_json('data\\cleaned_df_numerical_columns_only.json')
-# -
-
 df = pd.read_json('data\\cleaned_df_numerical_columns_only.json')
 
 df

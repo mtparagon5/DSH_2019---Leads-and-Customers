@@ -205,7 +205,8 @@ plt.show()
 #      - that, combined with the fact the bdays are to recent, the data could have been created
 #  - the max count of any given zip seems to be 4
 
-df_zip_described.index.unique()
+# +
+# df_zip_described.index.unique()
 
 # +
 # df_zip_described.boxplot(column=['count', 'mean', 'std', 'min', '25%', '50%', '75%', 'max'])
@@ -539,7 +540,7 @@ df_numerical = df_lac.drop(to_drop, axis=1)
 df_numerical.max()
 
 df_numerical
-df_numerical.to_json('data\\cleaned_df_numerical_columns_only.json', orient='records')
+df_numerical.to_json('data\\cleaned_df_numerical_columns_only.json')
 
 # ### A test to see differences when duplicate usernames are dropped
 #
