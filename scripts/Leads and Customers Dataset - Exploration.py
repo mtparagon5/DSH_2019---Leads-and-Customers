@@ -14,7 +14,7 @@
 # ---
 
 # # Leads and Customers Dataset - Exploration
-# matthew thomas
+# Matthew Thomas
 # <br>
 # mt.paragon5@gmail.com
 
@@ -25,10 +25,13 @@
 import pandas as pd
 import datetime as dt
 import matplotlib.pyplot as plt
+from matplotlib import style
+
+style.use('ggplot')
 # -
 
-leads_and_customers = 'data\\leads-and-customers.csv'
-lead_scoring_fields = 'data\\Lead-Scoring-Fields.csv'
+leads_and_customers = '..\\data\\leads-and-customers.csv'
+lead_scoring_fields = '..\\data\\Lead-Scoring-Fields.csv'
 
 df_lac = pd.read_csv(leads_and_customers)
 df_lsf = pd.read_csv(lead_scoring_fields)
@@ -44,14 +47,68 @@ df_lsf = pd.read_csv(lead_scoring_fields)
 
 df_lac.dtypes
 
-# #### rename column names
+# ### Renaming column names
 
 df_lac.columns = map(str.lower, df_lac.columns)
 df_lac.columns = df_lac.columns.str.replace(' ', '_')
 df_lac.columns = df_lac.columns.str.replace('-', '_to_')
 df_lac.columns = df_lac.columns.str.replace('+', '_plus')
 
-# #### column manipulation
+# ### Looking to see the relationship between emails and frequency of conversion
+# #### Observation: 
+# - email addresses do not always correspond to the same username or score
+# - likely renders this attribute useless
+
+df_duplicate_emails = df_lac[df_lac.duplicated(subset=['mail'], keep=False)]
+df_duplicate_emails.shape
+
+df_lac['mail_total_freq'] = df_lac.groupby('mail')['mail'].transform('count')
+df_lac['mail_total_converted'] = df_lac.groupby('mail')['converted'].transform('sum')
+# performing a check
+df_lac[df_lac.mail=='qturner@hotmail.com'][['mail','username','mail_total_freq','converted','mail_total_converted', 'score']]
+
+df_lac[df_lac.mail_total_freq>2][['mail','username','mail_total_freq','converted','mail_total_converted', 'score']].head()
+
+for i in range(6):
+    print('freq email >',i)
+    print(df_lac[df_lac.mail_total_freq>i][['mail_total_freq','converted','mail_total_converted', 'score']].mean())
+    print(50*'-')
+
+# ### Looking to see the relationship between usernames and frequency of conversion
+# #### Observation: 
+# - usernames addresses do not always correspond to the same username or score
+# - likely renders this attribute useless
+
+df_duplicate_usernames = df_lac[df_lac.duplicated(subset=['username'], keep=False)]
+df_duplicate_usernames.shape
+
+df_lac['username_total_freq'] = df_lac.groupby('username')['username'].transform('count')
+df_lac['username_total_converted'] = df_lac.groupby('username')['converted'].transform('sum')
+# performing a check
+df_lac[['mail','username','username_total_freq','converted','username_total_converted', 'score']]
+
+df_lac[df_lac.username_total_freq>1][['mail','username','username_total_freq','converted','username_total_converted', 'score']].head()
+
+for i in range(33):
+    print('freq username >',i)
+    print(df_lac[df_lac.username_total_freq>i][['username_total_freq','converted','username_total_converted', 'score']].mean())
+    print(50*'-')
+
+# ### A look at some scatter plots
+# - fields with high values e.g., score, days_since, etc. and converted
+
+# +
+df_high_values = df_lac[['days_since_signup','score','converted']]
+df_high_values
+
+plt.scatter(df_lac.days_since_signup, df_lac.converted)
+plt.show()
+# -
+
+plt.scatter(df_lac.score, df_lac.converted)
+plt.show()
+
+# ### Column manipulation
 #  - change birthdate to datetime
 #  - add age_seconds column (int); not sure if useful
 #  - added year_month column to investigate trends in scores by age groups
@@ -128,6 +185,11 @@ df_m_described = df_score_grouped_by_m.describe()
 'zip_min: {0} -- zip_max: {1}'.format(df_lac['zip_code'].min(), df_lac['zip_code'].max())
 
 
+# ### A look at the described score that's groupedby month of birth
+#
+# #### Observation:
+# - customers born in June seem to have lower average scores
+
 def plot_df_described(df_described_to_plot):
 
     fig, axs = plt.subplots(7,1,figsize=(15,25))
@@ -150,11 +212,6 @@ def plot_df_described(df_described_to_plot):
 
 
     plt.show()
-
-# ### A look at the described score that's groupedby month of birth
-#
-# #### Observation:
-# - customers born in June seem to have lower average scores
 
 # ----- plots of the score df groupedby month  ----- #
 plot_df_described(df_m_described)
@@ -218,6 +275,8 @@ plt.show()
 # +
 # df_lac.dtypes
 # -
+
+# ### Some resampling of the data
 
 # #### df of each column with number value and its mean resampled by year
 
@@ -533,14 +592,18 @@ to_drop = ['address',
            'company_size', 
            'industry', 
            'bd_year_month',
-           'zip_code']
+           'zip_code',
+           'mail_total_freq',
+           'mail_total_converted',
+           'username_total_freq',
+           'username_total_converted']
 
-df_numerical = df_lac.drop(to_drop, axis=1)
+df_numerical = df_lac.drop(columns=to_drop, axis=1)
 
 df_numerical.max()
 
 df_numerical
-df_numerical.to_json('data\\cleaned_df_numerical_columns_only.json')
+df_numerical.to_json('..\\data\\cleaned_df_numerical_columns_only.json')
 
 # ### A test to see differences when duplicate usernames are dropped
 #
