@@ -17,114 +17,19 @@
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
+import pickle, random
 
 import sklearn
-from sklearn import ensemble, model_selection, preprocessing, tree, linear_model
+from sklearn import ensemble, model_selection, preprocessing, tree, linear_model, neighbors
 from sklearn.metrics import confusion_matrix
 from yellowbrick.classifier import ROCAUC
 from yellowbrick.classifier import ClassificationReport, ConfusionMatrix
 
-# -
-
-df = pd.read_json('data\\cleaned_df_numerical_columns_only.json')
-
-df
-
-# +
-# columns = np.array(df.columns)
-
-# fig, axs = plt.subplots(len(columns),1,figsize=(15,150))
-
-# # df.T.iloc[0].name
-# N=100000
-
-# for i in range(len(columns)):
-#     xs = df.T.iloc[i]
-#     ys = df.converted
-#     colors = np.random.rand(N)
-#     axs[i].scatter(xs, ys, c=colors)
-#     axs[i].set_xlabel(df.T.iloc[i].name)
-#     axs[i].set_title(df.T.iloc[i].name)
-#     plt.tight_layout()
-
-# +
-# df_rel_vals = df.drop(columns=['score', 'days_since_signup'])
-
-# columns = np.array(df_rel_vals.columns)
-
-# fig, axs = plt.subplots(1,1,figsize=(15,15))
-
-# # df.T.iloc[0].name
-# N=1000
-# area = (30 * np.random.rand(N))**2  # 0 to 15 point radii
-
-# xs, ys = [], []
-
-# for i in range(len(columns)):
-#     xs = df_rel_vals.T.iloc[i]
-#     ys = df_rel_vals.T.loc['score_normalized']
-    
-#     plt.scatter(xs, ys, s=area, alpha=0.5)
-#     plt.tight_layout()
-# # xs
 
 # -
 
-# ### Random Forest
-
-X = df.drop(columns=['converted'])
-y = df.converted
-
-X_train, X_test, y_train, y_test = model_selection.train_test_split(X,y,test_size=.25, random_state=42)
-
-# +
-rf1 = ensemble.RandomForestClassifier(random_state=42)
-rf1.fit(X_train, y_train)
-rf1.score(X_test, y_test)
-
-cm = confusion_matrix(y_test, y_pred)
-# -
-
-cm
-
-plot_confusion_matrix(cm           = cm, 
-                      normalize    = False,
-                      target_names = ['No', 'Yes'],
-                      title        = "Confusion Matrix -- Random Forest")
-
-# ##### ROC Curve
-
-# +
-# fig, ax = plt.subplots(figsize=(10,10))
-# roc_viz = ROCAUC(rf1)
-# roc_viz.score(X_test,y_test)
-
-# roc_viz.poof()
-# -
-
-# ## Logistic Regression
-
-# +
-X = df.drop(columns=['converted'])
-y = df.converted
-
-X_train, X_test, y_train, y_test = model_selection.train_test_split(X,y,test_size=.25, random_state=0)
-# -
-
-classifier = linear_model.LogisticRegression(random_state=0)
-classifier.fit(X_train, y_train)
-
-y_pred = classifier.predict(X_test)
-
-classifier.score(X_test, y_test)
-
-cm = confusion_matrix(y_test, y_pred)
-
-cm
-
-# +
-import numpy as np
-
+# ### I'm using  plot_confusion_matrix  function taken from kernel found on Kaggle
+# ####  Credit to [George Fisher](https://www.kaggle.com/grfiv4/plot-a-confusion-matrix/notebook) who has licensed it under an [Apache 2.0](https://www.apache.org/licenses/LICENSE-2.0)  open source license
 
 def plot_confusion_matrix(cm,
                           target_names,
@@ -204,11 +109,191 @@ def plot_confusion_matrix(cm,
     plt.xlabel('Predicted label\naccuracy={:0.4f}; misclass={:0.4f}'.format(accuracy, misclass))
     plt.show()
 
+
+# ### A function for pickling the classifiers (not necessary)
+
+# +
+def pickle_classifier(filepath, classifier):
+    """Function to automate the pickling of a classifier
+    """
+    with open(filepath, 'wb') as f:
+        pickle.dump(classifier, f)
+
+def load_pickled_classifier(filepath):
+    """Function to load a pickled classifier
+    """
+    with open(filepath, 'rb') as f:
+        return pickle.load(f)
+
+
+# +
+df = pd.read_json('..\\data\\cleaned_df_numerical_columns_only.json')
+df = df.astype(float)
+# moving converted to last column (was thinking of using random.shuffle)
+df_converted = df['converted']
+df = df.drop(['converted'], axis=1)
+df['converted'] = df_converted
+
+redundant_columns = [
+    'score_normalized',
+    'days_since_signup_normalized'
+]
+df.drop(redundant_columns, axis=1, inplace=True)
 # -
+
+df.head()
+
+# ### Random Forest
+
+X = df.drop(columns=['converted'])
+X = preprocessing.scale(X)
+y = df.converted
+
+# +
+for i in range(1, 11):
+    X_train, X_test, y_train, y_test = model_selection.train_test_split(X,y,test_size=.25, random_state=None)
+
+    n_trees = 500
+    clf = ensemble.RandomForestClassifier(max_features='auto', n_estimators=n_trees, random_state=None, n_jobs=-1)
+    clf.fit(X_train, y_train)
+    accuracy = clf.score(X_test, y_test)
+    print('Test {0} Accuracy:\t{1}'.format(i, accuracy))
+    
+pickle_classifier('..\\classifiers\\random_forest.pickle', clf)
+# -
+
+y_pred = clf.predict(X_test)
+cm = confusion_matrix(y_test, y_pred)
+cm
+
+plot_confusion_matrix(cm           = cm, 
+                      normalize    = False,
+                      target_names = ['No', 'Yes'],
+                      title        = "Confusion Matrix -- Random Forest")
+
+print(clf.decision_path(X))
+print(clf.feature_importances_)
+
+# ##### ROC Curve
+
+# +
+# fig, ax = plt.subplots(figsize=(10,10))
+# roc_viz = ROCAUC(clf)
+# roc_viz.score(X_test,y_test)
+
+# roc_viz.poof()
+# -
+
+# ## Logistic Regression
+
+X = df.drop(columns=['converted'])
+X = preprocessing.scale(X)
+y = df.converted
+
+# +
+for i in range(1, 11):
+    X_train, X_test, y_train, y_test = model_selection.train_test_split(X,y,test_size=.25, random_state=None)
+
+    clf = linear_model.LogisticRegression(random_state=None, solver='lbfgs', n_jobs=-1)
+    clf.fit(X_train, y_train)
+    accuracy = clf.score(X_test, y_test)
+    print('Test {0} Accuracy:\t{1}'.format(i, accuracy))
+    
+pickle_classifier('..\\classifiers\\logistic_regression.pickle', clf)
+# -
+
+y_pred = clf.predict(X_test)
+cm = confusion_matrix(y_test, y_pred)
+cm
+
+print(clf.decision_function(X))
+print(clf.decision_function(X).mean())
+pd.DataFrame(clf.decision_function(X)>0).describe()
 
 plot_confusion_matrix(cm           = cm, 
                       normalize    = False,
                       target_names = ['No', 'Yes'],
                       title        = "Confusion Matrix -- Logistic Regression")
+
+# ## Linear Regression
+
+X = df.drop(columns=['converted'])
+X = preprocessing.scale(X)
+y = df.converted
+
+# +
+for i in range(1, 11):
+    X_train, X_test, y_train, y_test = model_selection.train_test_split(X,y,test_size=.25, random_state=None)
+
+    clf = linear_model.LinearRegression(n_jobs=-1)
+    clf.fit(X_train, y_train)
+    accuracy = clf.score(X_test, y_test)
+    print('Test {0} Accuracy:\t{1}'.format(i, accuracy))
+    
+pickle_classifier('..\\classifiers\\linear_regression.pickle', clf)
+# -
+
+y_pred = clf.predict(X_test)
+y_pred = [0 if c <= 0.5 else 1 for c in y_pred]
+cm = confusion_matrix(y_test, y_pred)
+cm
+
+plot_confusion_matrix(cm           = cm, 
+                      normalize    = False,
+                      target_names = ['No', 'Yes'],
+                      title        = "Confusion Matrix -- Linear Regression")
+
+# ## K Nearest Neighbor (KNN)
+
+X = df.drop(columns=['converted'])
+X = preprocessing.scale(X)
+y = df.converted
+
+# #### KNN Regressor
+
+# +
+for i in range(1, 11):
+    X_train, X_test, y_train, y_test = model_selection.train_test_split(X,y,test_size=.25, random_state=None)
+
+    clf = neighbors.KNeighborsRegressor(n_neighbors=5, n_jobs=-1)
+    clf.fit(X_train, y_train)
+    accuracy = clf.score(X_test, y_test)
+    print('Test {0} Accuracy:\t{1}'.format(i, accuracy))
+    
+pickle_classifier('..\\classifiers\\knn_regressor.pickle', clf)
+# -
+
+y_pred = clf.predict(X_test)
+y_pred = [0 if c <= 0.5 else 1 for c in y_pred]
+cm = confusion_matrix(y_test, y_pred)
+cm
+
+plot_confusion_matrix(cm           = cm, 
+                      normalize    = False,
+                      target_names = ['No', 'Yes'],
+                      title        = "Confusion Matrix -- KNN Regressor")
+
+# #### KNN Classifier
+
+# +
+for i in range(1, 11):
+    X_train, X_test, y_train, y_test = model_selection.train_test_split(X,y,test_size=.25, random_state=None)
+
+    clf = neighbors.KNeighborsClassifier(n_neighbors=5, n_jobs=-1)
+    clf.fit(X_train, y_train)
+    accuracy = clf.score(X_test, y_test)
+    print('Test {0} Accuracy:\t{1}'.format(i, accuracy))
+    
+pickle_classifier('..\\classifiers\\knn_classifier.pickle', clf)
+# -
+
+y_pred = clf.predict(X_test)
+cm = confusion_matrix(y_test, y_pred)
+cm
+
+plot_confusion_matrix(cm           = cm, 
+                      normalize    = False,
+                      target_names = ['No', 'Yes'],
+                      title        = "Confusion Matrix -- KNN Classifier")
 
 
