@@ -1,41 +1,37 @@
-address,"27105 Christopher Station
-Kevinborough, WA 91949-7197","78597 Gina Grove
-North Rebeccaberg, IL 61475","0628 Sanders Plains
-Lake Jenna, VA 56410","9774 Moore Square Suite 477
-Gonzalezfurt, OR 08748-6602","77324 John Tunnel
-South Shirleyfort, WA 36499-0790"
-birthdate,40398,29924,28970,38546,26834
-mail,qturner@hotmail.com,carramy@yahoo.com,sbrown@yahoo.com,bdixon@gmail.com,harrisandrea@gmail.com
-name,Samuel Simpson,Angelica Sanchez,Connie Taylor,Alexis Jones,Lisa Wright
-sex,M,F,F,F,F
-username,debrapeterson,mbrooks,aarongriffin,jeffreymorales,hamiltoncameron
-days_since_signup,18,3,26,19,7
-acquisition_channel,Organic Search,Organic Search,Organic Search,Cold Email,Organic Search
-job_title,Marketing Director,Promotion Manager,Information Systems Manager,Territory Sales Manager,Data Processing Manager
-company_size,18568,251-1000,1000-10000,10-Jan,10001
-completed_form,1,1,0,1,1
-visited_pricing,1,0,1,1,1
-registered_for_webinar,0,1,0,1,0
-attended_webinar,0,0,0,1,0
-industry,Web & Internet,Web & Internet,Web & Internet,Web & Internet,Web & Internet
-converted,1,0,0,1,0
-is_manager,1,0,0,0,0
-acquisition_channel_Cold Call,0,0,0,0,0
-acquisition_channel_Cold Email,0,0,0,1,0
-acquisition_channel_Organic Search,1,1,1,0,1
-acquisition_channel_Paid Leads,0,0,0,0,0
-acquisition_channel_Paid Search,0,0,0,0,0
-company_size_1-10,0,0,0,1,0
-company_size_1000-10000,0,0,1,0,0
-company_size_10001+,0,0,0,0,1
-company_size_101-250,0,0,0,0,0
-company_size_11-50,1,0,0,0,0
-company_size_251-1000,0,1,0,0,0
-company_size_51-100,0,0,0,0,0
-industry_Financial Services,0,0,0,0,0
-industry_Furniture,0,0,0,0,0
-industry_Heavy Manufacturing,0,0,0,0,0
-Scandanavion Design,0,0,0,0,0
-Transportation,0,0,0,0,0
-Internet,1,1,1,1,1
-score,151,141.3584381,120.4487482,250.3352637,0
+"27105 Christopher Station
+Kevinborough, WA 91949-7197",address,=,models.,CharField,(,max_length=,100,),address=models.CharField(max_length=100)
+40398,birthdate,=,models.,IntegerField,(,,,),birthdate=models.IntegerField()
+qturner@hotmail.com,mail,=,models.,EmailField,(,max_length=,100,),mail=models.EmailField(max_length=100)
+Samuel Simpson,name,=,models.,CharField,(,max_length=,50,),name=models.CharField(max_length=50)
+M,sex,=,models.,CharField,(,max_length=,6,),sex=models.CharField(max_length=6)
+debrapeterson,username,=,models.,CharField,(,max_length=,50,),username=models.CharField(max_length=50)
+18,days_since_signup,=,models.,IntegerField,(,,,),days_since_signup=models.IntegerField()
+Organic Search,acquisition_channel,=,models.,CharField,(,max_length=,50,),acquisition_channel=models.CharField(max_length=50)
+Marketing Director,job_title,=,models.,CharField,(,max_length=,50,),job_title=models.CharField(max_length=50)
+18568,company_size,=,models.,IntegerField,(,,,),company_size=models.IntegerField()
+1,completed_form,=,models.,IntegerField,(,,,),completed_form=models.IntegerField()
+1,visited_pricing,=,models.,IntegerField,(,,,),visited_pricing=models.IntegerField()
+0,registered_for_webinar,=,models.,IntegerField,(,,,),registered_for_webinar=models.IntegerField()
+0,attended_webinar,=,models.,IntegerField,(,,,),attended_webinar=models.IntegerField()
+Web & Internet,industry,=,models.,CharField,(,max_length=,50,),industry=models.CharField(max_length=50)
+1,converted,=,models.,IntegerField,(,,,),converted=models.IntegerField()
+1,is_manager,=,models.,IntegerField,(,,,),is_manager=models.IntegerField()
+0,acquisition_channel_Cold Call,=,models.,IntegerField,(,,,),acquisition_channel_Cold Call=models.IntegerField()
+0,acquisition_channel_Cold Email,=,models.,IntegerField,(,,,),acquisition_channel_Cold Email=models.IntegerField()
+1,acquisition_channel_Organic Search,=,models.,IntegerField,(,,,),acquisition_channel_Organic Search=models.IntegerField()
+0,acquisition_channel_Paid Leads,=,models.,IntegerField,(,,,),acquisition_channel_Paid Leads=models.IntegerField()
+0,acquisition_channel_Paid Search,=,models.,IntegerField,(,,,),acquisition_channel_Paid Search=models.IntegerField()
+0,company_size_1-10,=,models.,IntegerField,(,,,),company_size_1-10=models.IntegerField()
+0,company_size_1000-10000,=,models.,IntegerField,(,,,),company_size_1000-10000=models.IntegerField()
+0,company_size_10001+,=,models.,IntegerField,(,,,),company_size_10001+=models.IntegerField()
+0,company_size_101-250,=,models.,IntegerField,(,,,),company_size_101-250=models.IntegerField()
+1,company_size_11-50,=,models.,IntegerField,(,,,),company_size_11-50=models.IntegerField()
+0,company_size_251-1000,=,models.,IntegerField,(,,,),company_size_251-1000=models.IntegerField()
+0,company_size_51-100,=,models.,IntegerField,(,,,),company_size_51-100=models.IntegerField()
+0,industry_Financial Services,=,models.,IntegerField,(,,,),industry_Financial Services=models.IntegerField()
+0,industry_Furniture,=,models.,IntegerField,(,,,),industry_Furniture=models.IntegerField()
+0,industry_Heavy Manufacturing,=,models.,IntegerField,(,,,),industry_Heavy Manufacturing=models.IntegerField()
+0,Scandanavion Design,=,models.,IntegerField,(,,,),Scandanavion Design=models.IntegerField()
+0,Transportation,=,models.,IntegerField,(,,,),Transportation=models.IntegerField()
+1,Internet,=,models.,IntegerField,(,,,),Internet=models.IntegerField()
+151,score,=,models.,IntegerField,(,,,),score=models.IntegerField()
