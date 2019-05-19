@@ -3,7 +3,7 @@ from django.db import models
 class Lead(models.Model):
     # lead_ref_id=models.CharField(max_length=100, blank=True, unique=True, default=uuid.uuid4) -- not sure if this is necessary
     address=models.CharField(max_length=100)
-    birthdate=models.IntegerField()
+    birthdate=models.CharField(max_length=8)
     mail=models.EmailField(max_length=100)
     name=models.CharField(max_length=50)
     sex=models.CharField(max_length=6)
