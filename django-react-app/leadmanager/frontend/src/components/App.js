@@ -1,9 +1,19 @@
-import React, {Component} from 'react';
+import React, {Component, Fragment} from 'react';
 import ReactDOM from 'react-dom';
+
+import { Header } from './layout/Header';
+import { SampleJSON } from './layout/SampleJSON';
 
 class App extends Component {
     render() {
-        return <h1>React App</h1>
+        return (
+            <Fragment>
+                <Header/>
+                <div className="container">
+                    <SampleJSON/>
+                </div>
+            </Fragment>
+        )
     }
 }
 
